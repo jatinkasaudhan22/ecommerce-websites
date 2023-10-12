@@ -2,10 +2,13 @@ from django.shortcuts import render, redirect
 from users.forms import RegisterForm, UserRegisterForm
 from django.contrib import messages
 from users.models import Profile, User
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, logout, login
+from django.contrib.auth.decorators import login_required
+
+
 # Create your views here.
 def home(request):
-    return render(request, template_name= "index.html")
+    return render(request, template_name="index.html")
 
 
 def user_login(request):
@@ -20,14 +23,15 @@ def user_login(request):
             return redirect("/login")
         is_valid_user = authenticate(username=check_user[0].username, password=password)
         if is_valid_user:
+            login(request, is_valid_user)
             return redirect("/profile")
         else:
             error = "Invalid Email or Password"
             messages.error(request, error)
             return redirect("/login")
 
+    return render(request, template_name="login.html")
 
-    return render(request, template_name= "login.html")
 
 def user_register(request):
     form = UserRegisterForm()
@@ -68,5 +72,16 @@ def user_register(request):
     return render(request, "register.html", {"form": form})
 
 
+@login_required
 def user_profile(request):
-    return render(request, template_name= "profile.html")
+    user_id = request.user.pk  # get user id of logged in user
+    # equivalent sql: SELECT * FROM profile WHERE user_id = 1
+    # get profile of user with id user_id
+    profile = Profile.objects.get(user_id=user_id)
+    context = {"profile": profile}
+    return render(request, "profile.html", context)
+
+
+def user_logout(request):
+    logout(request)
+    return redirect("/login")
