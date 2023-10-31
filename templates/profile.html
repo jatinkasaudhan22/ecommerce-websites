@@ -8,8 +8,13 @@
       <div class="col-lg-4">
         <div class="card mb-4">
           <div class="card-body text-center">
-            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp" alt="avatar"
-              class="rounded-circle img-fluid" style="width: 150px;">
+            {% if profile.profile_pic == 'N/A' %}
+            <img src="https://i.pinimg.com/736x/3f/94/70/3f9470b34a8e3f526dbdb022f9f19cf7.jpg" alt="avatar"
+                 class="rounded-circle img-fluid" style="width: 150px;">
+            {% else %}
+            <img src="{{ profile.profile_pic }}" alt="avatar"
+                 class="rounded-circle img-fluid" style="width: 150px;">
+            {% endif %}
             <h5 class="my-3">{{ profile.user.username }}</h5>
             <div class="d-flex justify-content-center mb-2">
                <div class="form-group">

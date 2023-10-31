@@ -5,8 +5,9 @@
   <div class="container">
     <div class="row">
       <div class="col-xl-8 col-lg-8 mb-4">
-
         <!-- Checkout -->
+        <form  action="{% url 'checkout_page' %}" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
         <div class="card shadow-0 border">
           <div class="p-4">
             <hr class="my-4" />
@@ -16,7 +17,8 @@
                 <!-- Default checked radio -->
                 <div class="form-check h-100 border rounded-3">
                   <div class="p-3">
-                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked />
+                    <input class="form-check-input" type="radio" name="shipping_type" id="flexRadioDefault1" checked
+                    value="EXPRESS"/>
                     <label class="form-check-label" for="flexRadioDefault1">
                       Express delivery <br />
                       <small class="text-muted">3-4 days via Fedex </small>
@@ -28,7 +30,8 @@
                 <!-- Default radio -->
                 <div class="form-check h-100 border rounded-3">
                   <div class="p-3">
-                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" />
+                    <input class="form-check-input" type="radio" name="shipping_type" id="flexRadioDefault2"
+                    value="POST_OFFICE"/>
                     <label class="form-check-label" for="flexRadioDefault2">
                       Post office <br />
                       <small class="text-muted">20-30 days via post </small>
@@ -40,7 +43,8 @@
                 <!-- Default radio -->
                 <div class="form-check h-100 border rounded-3">
                   <div class="p-3">
-                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault3" />
+                    <input class="form-check-input" type="radio" name="shipping_type" id="flexRadioDefault3"
+                    value="SELF_PICKUP"/>
                     <label class="form-check-label" for="flexRadioDefault3">
                       Self pick-up <br />
                       <small class="text-muted">Come to our shop </small>
@@ -53,52 +57,30 @@
               <div class="col-sm-8 mb-3">
                 <p class="mb-0">Address</p>
                 <div class="form-outline">
-                  <input type="text" id="typeText" placeholder="Type here" class="form-control" />
+                  <input type="text" name="shipping_address" id="typeText" placeholder="Type here" class="form-control" />
                 </div>
               </div>
+
               <div class="col-sm-4 mb-3">
                 <p class="mb-0">City</p>
-                <select class="form-select">
-                  <option value="1">New York</option>
-                  <option value="2">Moscow</option>
-                  <option value="3">Samarqand</option>
-                </select>
-              </div>
-              <div class="col-sm-4 mb-3">
-                <p class="mb-0">House</p>
                 <div class="form-outline">
-                  <input type="text" id="typeText" placeholder="Type here" class="form-control" />
+                  <input type="text" name="city" id="typeText" placeholder="Type here" class="form-control" />
                 </div>
               </div>
-              <div class="col-sm-4 col-6 mb-3">
-                <p class="mb-0">Postal code</p>
-                <div class="form-outline">
-                  <input type="text" id="typeText" class="form-control" />
-                </div>
-              </div>
-              <div class="col-sm-4 col-6 mb-3">
-                <p class="mb-0">Zip</p>
-                <div class="form-outline">
-                  <input type="text" id="typeText" class="form-control" />
-                </div>
-              </div>
-            </div>
-            <div class="form-check mb-3">
-              <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault1" />
-              <label class="form-check-label" for="flexCheckDefault1">Save this address</label>
             </div>
             <div class="mb-3">
               <p class="mb-0">Message to seller</p>
               <div class="form-outline">
-                <textarea class="form-control" id="textAreaExample1" rows="2"></textarea>
+                <textarea name="message" class="form-control" id="textAreaExample1" rows="2"></textarea>
               </div>
             </div>
             <div class="float-end">
               <button class="btn btn-light border">Cancel</button>
-              <button class="btn btn-success shadow-0 border">Continue</button>
+              <button type="submit" class="btn btn-success shadow-0 border">Continue</button>
             </div>
           </div>
         </div>
+          </form>
         <!-- Checkout -->
       </div>
       <div class="col-xl-4 col-lg-4 d-flex justify-content-center justify-content-lg-end">
@@ -106,20 +88,20 @@
           <h6 class="mb-3">Summary</h6>
           <div class="d-flex justify-content-between">
             <p class="mb-2">Total price:</p>
-            <p class="mb-2">$195.90</p>
+            <p class="mb-2">Rs {{total}}</p>
           </div>
           <div class="d-flex justify-content-between">
             <p class="mb-2">Discount:</p>
-            <p class="mb-2 text-danger">- $60.00</p>
+            <p class="mb-2 text-danger">- Rs {{discount}}</p>
           </div>
           <div class="d-flex justify-content-between">
             <p class="mb-2">Shipping cost:</p>
-            <p class="mb-2">+ $14.00</p>
+            <p class="mb-2">+ Rs {{shipping_cost}}</p>
           </div>
           <hr />
           <div class="d-flex justify-content-between">
             <p class="mb-2">Total price:</p>
-            <p class="mb-2 fw-bold">$149.90</p>
+            <p class="mb-2 fw-bold">Rs {{grand_total}}</p>
           </div>
           <div class="input-group mt-3 mb-4">
             <input type="text" class="form-control border" name="" placeholder="Promo code" />
@@ -127,48 +109,22 @@
           </div>
           <hr />
           <h6 class="text-dark my-4">Items in cart</h6>
+          {% for item in cart_items %}
           <div class="d-flex align-items-center mb-4">
             <div class="me-3 position-relative">
               <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill badge-secondary">
-                1
+                {{ item.cart_qty }}
               </span>
-              <img src="https://bootstrap-ecommerce.com/bootstrap5-ecommerce/images/items/7.webp" style="height: 96px; width: 96x;" class="img-sm rounded border" />
+              <img src="{{ item.product.product_img }}" style="height: 96px; width: 96x;" class="img-sm rounded border" />
             </div>
             <div class="">
-              <a href="#" class="nav-link">
-                Gaming Headset with Mic <br />
-                Darkblue color
+              <a href="{% url  'product_detail_page' product_id=item.product.pk %}" class="nav-link">
+                {{ item.product.title }} <br />
               </a>
-              <div class="price text-muted">Total: $295.99</div>
+              <div class="price text-muted">Total: Rs {{item.cart_total}}</div>
             </div>
           </div>
-          <div class="d-flex align-items-center mb-4">
-            <div class="me-3 position-relative">
-              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill badge-secondary">
-                1
-              </span>
-              <img src="https://bootstrap-ecommerce.com/bootstrap5-ecommerce/images/items/5.webp" style="height: 96px; width: 96x;" class="img-sm rounded border" />
-            </div>
-            <div class="">
-              <a href="#" class="nav-link">
-                Apple Watch Series 4 Space <br />
-                Large size
-              </a>
-              <div class="price text-muted">Total: $217.99</div>
-            </div>
-          </div>
-          <div class="d-flex align-items-center mb-4">
-            <div class="me-3 position-relative">
-              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill badge-secondary">
-                3
-              </span>
-              <img src="https://bootstrap-ecommerce.com/bootstrap5-ecommerce/images/items/1.webp" style="height: 96px; width: 96x;" class="img-sm rounded border" />
-            </div>
-            <div class="">
-              <a href="#" class="nav-link">GoPro HERO6 4K Action Camera - Black</a>
-              <div class="price text-muted">Total: $910.00</div>
-            </div>
-          </div>
+          {% endfor %}
         </div>
       </div>
     </div>
