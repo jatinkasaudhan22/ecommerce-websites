@@ -11,13 +11,22 @@ from django.core.paginator import Paginator
 # Create your views here.
 
 def home(request):
-    sort_by = request.GET.get("sort_by", '-created_at')
-    products = Products.objects.all().order_by(sort_by)
-    page_size = request.GET.get("per_page", 1)
-    paginator = Paginator(products, page_size)  # Show 2 products per page.
+    sort_by = request.GET.get("sort_by")
+    if sort_by:
+        request.session["sort_by"] = sort_by  # save sort to user session
+    sort_by = request.session.get("sort_by", "-created_at")  # get sort from user session
+    # check for search query
+    search_query = request.GET.get("query", None)
+    print("Search Query: ", search_query)
+    if search_query is not None:
+        products = Products.objects.filter(title__icontains=search_query).order_by(sort_by)
+    else:
+        products = Products.objects.all().order_by(sort_by)
+    page_size = request.GET.get("per_page", 3)
+    paginator = Paginator(products, page_size)  # Show 1 products per page.
     page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
-    context = {"products": page_obj}
+    page_data = paginator.get_page(page_number)
+    context = {"products": page_data}
     return render(request, "index.html", context)
 
 def user_login(request):
